@@ -127,6 +127,7 @@ export const getVideos = async (req: Request<{ movie_id: string }, {}, {}, { lan
         const { language = 'pt-br' } = req.query;
 
         const url = `${BASE_URL}/movie/${movie_id}/videos`;
+        const YOUTUBE_BASE_URL = 'https://www.youtube.com/watch?v=';
 
         const { data } = await axios.get<VideoApiResponse>(url, {
             headers: { Authorization: `Bearer ${API_KEY}` },
@@ -135,15 +136,13 @@ export const getVideos = async (req: Request<{ movie_id: string }, {}, {}, { lan
             }
         });
 
-        const firstVideo = data.results.length > 0 ? data.results[0] : null;
+        const youtubeVideos = data.results.filter(video => video.site === 'YouTube');
 
+        const firstYoutubeVideo = youtubeVideos.length > 0 ? youtubeVideos[0] : null;
+        
+        
         const response = {
-            id: data.id,
-            video: firstVideo ? {
-                id: firstVideo.id,
-                key: firstVideo.key,
-                site: firstVideo.site
-            } : null
+            url: firstYoutubeVideo ? `${YOUTUBE_BASE_URL}${firstYoutubeVideo.key}` : null
         };
 
         res.json(response);
