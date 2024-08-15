@@ -27,10 +27,11 @@ interface GetMoviesQuery {
     page?: string;
     primary_release_year?: string;
     primary_release_date_gte?: string;
-    primary_release_date_lte?: string; 
+    primary_release_date_lte?: string;
+    query?: string;
 }
 
-// Função para buscar filmes com filtro por data
+// Função para buscar filmes com filtros
 export const getMovies = async (req: Request<{}, {}, {}, GetMoviesQuery>, res: Response): Promise<void> => {
     try {
         const API_KEY: string = process.env.API_KEY || '';
@@ -38,15 +39,17 @@ export const getMovies = async (req: Request<{}, {}, {}, GetMoviesQuery>, res: R
             page = '1',
             primary_release_year,
             primary_release_date_gte,
-            primary_release_date_lte
+            primary_release_date_lte,
+            query
         } = req.query;
+
+
+        const url = query ? `${BASE_URL}/search/movie` : `${BASE_URL}/discover/movie`;
 
         const params: Record<string, string> = {
             include_adult: 'false',
-            include_video: 'false',
             language: 'pt-br',
             page,
-            sort_by: 'popularity.desc'
         };
 
         if (primary_release_date_gte) {
@@ -58,8 +61,11 @@ export const getMovies = async (req: Request<{}, {}, {}, GetMoviesQuery>, res: R
         if (primary_release_year) {
             params['primary_release_year'] = primary_release_year;
         }
+        if (query) {
+            params['query'] = query;
+        }
 
-        const { data } = await axios.get<ApiResponse>(`${BASE_URL}/discover/movie`, {
+        const { data } = await axios.get<ApiResponse>(url, {
             headers: { Authorization: `Bearer ${API_KEY}` },
             params
         });
@@ -81,7 +87,7 @@ export const getMovies = async (req: Request<{}, {}, {}, GetMoviesQuery>, res: R
         };
 
         res.json(response);
-        
+
     } catch (error) {
         if (axios.isAxiosError(error)) {
             console.error('Erro ao buscar filmes', error.message);
