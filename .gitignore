@@ -1,0 +1,30 @@
+# Node modules
+/node_modules/
+
+# Build output
+/dist/
+
+# TypeScript configuration
+/tsconfig.tsbuildinfo
+
+# Environment variables
+/.env
+/.env.*
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE/editor files
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.suo
+*.ncb
+*.opendb
+*.vscode/
