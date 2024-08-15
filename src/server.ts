@@ -13,7 +13,7 @@ app.use(express.json());
 
 
 // Uso das rotas
-app.use('/api/movies', movieRoutes);
+app.use('/api', movieRoutes);
 
 
 // Inicia o servidor
