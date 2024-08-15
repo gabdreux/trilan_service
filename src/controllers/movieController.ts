@@ -31,7 +31,22 @@ interface GetMoviesQuery {
     query?: string;
 }
 
-// Função para buscar filmes com filtros
+
+interface Video {
+    key: string;
+    site: string;
+    id: string;
+}
+
+interface VideoApiResponse {
+    id: number;
+    results: Video[];
+}
+
+
+
+
+// Função para buscar filmes com filtros por nome e data
 export const getMovies = async (req: Request<{}, {}, {}, GetMoviesQuery>, res: Response): Promise<void> => {
     try {
         const API_KEY: string = process.env.API_KEY || '';
@@ -97,5 +112,50 @@ export const getMovies = async (req: Request<{}, {}, {}, GetMoviesQuery>, res: R
         }
 
         res.status(500).json({ error: 'Erro ao buscar filmes' });
+    }
+};
+
+
+
+
+
+// Função para buscar vídeos de um filme específico e retornar o primeiro
+export const getVideos = async (req: Request<{ movie_id: string }, {}, {}, { language?: string }>, res: Response): Promise<void> => {
+    try {
+        const API_KEY: string = process.env.API_KEY || '';
+        const { movie_id } = req.params;
+        const { language = 'pt-br' } = req.query;
+
+        const url = `${BASE_URL}/movie/${movie_id}/videos`;
+
+        const { data } = await axios.get<VideoApiResponse>(url, {
+            headers: { Authorization: `Bearer ${API_KEY}` },
+            params: {
+                language
+            }
+        });
+
+        const firstVideo = data.results.length > 0 ? data.results[0] : null;
+
+        const response = {
+            id: data.id,
+            video: firstVideo ? {
+                id: firstVideo.id,
+                key: firstVideo.key,
+                site: firstVideo.site
+            } : null
+        };
+
+        res.json(response);
+
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.error('Erro ao buscar vídeos', error.message);
+            console.error('Detalhes do erro:', error.response ? error.response.data : error.message);
+        } else {
+            console.error('Erro inesperado:', error);
+        }
+
+        res.status(500).json({ error: 'Erro ao buscar vídeos' });
     }
 };
