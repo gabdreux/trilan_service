@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import { helloWorld } from '../controllers/movieController';
+import { getMovies } from '../controllers/movieController';
+
+
 const router = Router();
 
 
 
-router.get('/hello', helloWorld);
+router.get('/discover', getMovies);
 
 
 export default router;
